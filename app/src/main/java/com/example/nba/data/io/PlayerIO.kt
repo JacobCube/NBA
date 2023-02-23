@@ -1,13 +1,21 @@
 package com.example.nba.data.io
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.nba.data.room.AppRoomDatabase
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /** Information about specific player */
+@Entity(tableName = AppRoomDatabase.ROOM_PLAYER_TABLE)
 data class PlayerIO(
 
     /** Player unique identification */
+    @PrimaryKey
     val id: Long? = null,
+
+    /** What page is this entity related to */
+    var page: Int? = null,
 
     /** first name of the player */
     @SerializedName("first_name")
@@ -26,7 +34,6 @@ data class PlayerIO(
     val lastName: String? = null,
 
     /** position in field */
-    //TODO probably ENUM, better leave as string for now
     val position: String? = null,
 
     /** in which team does this player play in */
@@ -34,6 +41,6 @@ data class PlayerIO(
 
     /** player's weight in pounds */
     @SerializedName("weight_pounds")
-    val weightPounds: Int? = null,
+    val weightPounds: Int? = null
 
-    ): Serializable
+): Serializable

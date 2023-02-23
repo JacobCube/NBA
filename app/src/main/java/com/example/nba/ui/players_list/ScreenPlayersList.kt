@@ -11,8 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.example.nba.data.io.PlayerIO
-import com.example.nba.data.io.PlayerTeamIO
 
 /**
  * Screen of a paginated list of all the NBA players
@@ -20,8 +18,8 @@ import com.example.nba.data.io.PlayerTeamIO
 @Preview(showBackground = true)
 @Composable
 fun ScreenPlayersList(
-    onItemClicked: (playerIO: PlayerIO) -> Unit = {},
-    onTeamClicked: (teamIO: PlayerTeamIO) -> Unit = {},
+    onItemClicked: (playerId: Long?) -> Unit = {},
+    onTeamClicked: (teamId: Long?) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<PlayersListViewModel>()
     val playersList = viewModel.requestPlayersList().collectAsLazyPagingItems()

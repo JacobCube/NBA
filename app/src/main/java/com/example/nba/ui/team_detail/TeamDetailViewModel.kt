@@ -2,17 +2,28 @@ package com.example.nba.ui.team_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel for connecting list of players to its equivalent API
+ * ViewModel for connecting team detail to its equivalent API
  */
 @HiltViewModel
 class TeamDetailViewModel @Inject constructor(
-    private val repository: TeamDetailRepository
+    private val repository: TeamDetailRepository,
+    val dataManager: TeamDetailDataManager
 ): ViewModel() {
 
+    /**
+     * Makes a request for a specific NBA team
+     * @param teamId team identification
+     */
+    fun getTeamById(teamId: String) {
+        viewModelScope.launch {
+            repository.getTeamById(teamId)?.let {
+                dataManager.team.value = it
+            }
+        }
+    }
 }

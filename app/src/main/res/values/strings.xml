@@ -3,4 +3,10 @@
     <string name="player_weight_feet_inches">%1$d\' %2$d\"</string>
     <string name="player_position">(%1$s)</string>
     <string name="player_weight_pounds">%1$d lbs</string>
+
+    <string name="screen_name_players_list">List of players</string>
+    <string name="screen_name_player_detail">Player detail</string>
+    <string name="screen_name_team_detail">Team detail</string>
+
+    <string name="team_detail_location">%1$s, %2$s %3$s</string>
 </resources>

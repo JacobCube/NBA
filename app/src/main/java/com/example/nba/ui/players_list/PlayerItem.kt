@@ -21,7 +21,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.nba.data.io.PlayerIO
-import com.example.nba.data.io.PlayerTeamIO
 import com.example.nba.ui.navigation.NBAActivity.Companion.PREVIEW_DEFAULT_PLAYER
 
 /** Player item displaying given data */
@@ -31,8 +30,8 @@ import com.example.nba.ui.navigation.NBAActivity.Companion.PREVIEW_DEFAULT_PLAYE
 inline fun PlayerItem(
     modifier: Modifier = Modifier,
     playerIO: PlayerIO = PREVIEW_DEFAULT_PLAYER,
-    crossinline onItemClicked: (playerIO: PlayerIO) -> Unit = {},
-    crossinline onTeamClicked: (teamIO: PlayerTeamIO) -> Unit = {}
+    crossinline onItemClicked: (playerId: Long?) -> Unit = {},
+    crossinline onTeamClicked: (teamId: Long?) -> Unit = {},
 ) {
     ConstraintLayout(
         modifier
@@ -42,7 +41,7 @@ inline fun PlayerItem(
                 indication = rememberRipple(color = MaterialTheme.colorScheme.surfaceTint),
                 enabled = true
             ) {
-                onItemClicked.invoke(playerIO)
+                onItemClicked.invoke(playerIO.id)
             }
             .padding(horizontal = 12.dp, vertical = 12.dp)
     ) {
@@ -68,7 +67,7 @@ inline fun PlayerItem(
                         indication = rememberRipple(color = MaterialTheme.colorScheme.surfaceTint),
                         enabled = true
                     ) {
-                        onTeamClicked.invoke(playerIO.team)
+                        onTeamClicked.invoke(playerIO.team.id)
                     }.constrainAs(team) {
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)

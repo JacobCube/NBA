@@ -1,10 +1,20 @@
 package com.example.nba.data.io
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.nba.data.room.AppRoomDatabase
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /** Meta information of paging response */
+@Entity(tableName = AppRoomDatabase.ROOM_PAGING_META_TABLE)
 data class PagingMetaIO(
+
+    /** Local room database identifier */
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo("player_id")
+    val playerId: Long? = null,
 
     /** How many pages are there in this database in total */
     @SerializedName("total_pages")
@@ -24,6 +34,13 @@ data class PagingMetaIO(
 
     /** How many items are there in this database in total */
     @SerializedName("total_count")
-    val totalCount: Int? = null
+    val totalCount: Int? = null,
+
+    /** At what time was this object created in milliseconds */
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis(),
+
+    /** Index of previous page, mainly for local Room database */
+    val previousPage: Int? = null
 
 ): Serializable

@@ -1,9 +1,12 @@
 package com.example.nba.ui.players_list
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.example.nba.data.PlayersRestApi
 import com.example.nba.data.io.PlayersListResponseIO
+import com.example.nba.data.room.AppRoomDatabase
+import com.example.nba.data.room.PlayersRemoteMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -12,18 +15,25 @@ import javax.inject.Inject
  * Repository for requesting the NBA API
  */
 class PlayersListRepository @Inject constructor(
-     private val restApi: PlayersRestApi
+     private val restApi: PlayersRestApi,
+     private val roomDatabase: AppRoomDatabase
 ) {
     /**
      * Returns paginated list of players
      * @param pagingConfig config for Paging Source
      */
+    @OptIn(ExperimentalPagingApi::class)
     fun getPagingList(pagingConfig: PagingConfig) = Pager(
         config = pagingConfig,
         pagingSourceFactory = {
-            PlayersListPagingSource(pagingConfig.pageSize) { pageIndex, perPage ->
-                getPlayerListPage(pageIndex, perPage)
-            }
+            roomDatabase.playerDbDao().getAllPlayers()
+        },
+        remoteMediator = PlayersRemoteMediator(
+            roomDatabase,
+            0,
+            pagingConfig.pageSize
+        ) { pageIndex, perPage ->
+            getPlayerListPage(pageIndex, perPage)
         }
     ).flow
 
@@ -40,7 +50,9 @@ class PlayersListRepository @Inject constructor(
             restApi.getPlayersListPage(
                 pageIndex = pageIndex,
                 perPage = perPage
-            ).body()
+            ).body()?.also {
+                roomDatabase.playerDbDao().insertAllPlayers(it.data)
+            }
         }
     }
 }

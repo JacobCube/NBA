@@ -15,14 +15,8 @@ object NavigationDestinations {
     /** Initial page identifier */
     const val INITIAL_PAGE = PLAYERS_LIST
 
-    /** argument identifier for [PlayerIO] serializable */
-    const val ARGUMENT_PLAYER_IO = "playerIO"
-
     /** argument identifier for identifier of a Player */
     const val ARGUMENT_PLAYER_ID = "playerId"
-
-    /** argument identifier for [PlayerTeamIO] serializable */
-    const val ARGUMENT_PLAYER_TEAM_IO = "playerTeamIO"
 
     /** argument identifier for identifier of a Team */
     const val ARGUMENT_PLAYER_TEAM_ID = "playerId"

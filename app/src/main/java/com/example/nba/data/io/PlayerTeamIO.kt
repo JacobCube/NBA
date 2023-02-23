@@ -1,12 +1,17 @@
 package com.example.nba.data.io
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.nba.data.room.AppRoomDatabase
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /** Information about specific player team */
+@Entity(tableName = AppRoomDatabase.ROOM_TEAM_TABLE)
 data class PlayerTeamIO(
 
     /** Player unique identification */
+    @PrimaryKey
     val id: Long? = null,
 
     /** team's shortened name */

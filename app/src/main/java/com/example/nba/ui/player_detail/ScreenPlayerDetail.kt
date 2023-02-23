@@ -1,6 +1,5 @@
 package com.example.nba.ui.player_detail
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,6 +9,8 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,15 +23,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.nba.R
-import com.example.nba.data.io.PlayerIO
-import com.example.nba.data.io.PlayerTeamIO
-import com.example.nba.ui.navigation.NBAActivity.Companion.PREVIEW_DEFAULT_PLAYER
 
 /**
- * Screen of a team
- * @param player serializable object with all necessary data
- * @param playerId in case we don't have all the information, we can download it using an identifier
+ * Screen of an NBA player detail
+ * @param playerId player identification for either accessing local or network services to retrieve needed information
  */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Preview(showBackground = true)
@@ -38,12 +34,16 @@ import com.example.nba.ui.navigation.NBAActivity.Companion.PREVIEW_DEFAULT_PLAYE
 fun ScreenPlayerDetail(
     modifier: Modifier = Modifier,
     playerId: String? = null,
-    onTeamClicked: (teamIO: PlayerTeamIO) -> Unit = {},
+    onTeamClicked: (teamId: Long?) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<PlayerDetailViewModel>()
-    Log.d("screen_player_detail", "playerId: $playerId, player: $player")
-
-    if(player != null) {
+    playerId?.let {
+        LaunchedEffect(Unit) {
+            viewModel.getPlayerById(it)
+        }
+    }
+    val playerState = viewModel.dataManager.player.collectAsState()
+    playerState.value?.let { player ->
         ConstraintLayout(
             modifier
                 .fillMaxWidth()
@@ -52,7 +52,7 @@ fun ScreenPlayerDetail(
             val (txtName, txtHeight, txtWeight, txtPosition, team, imgWeight, imgHeight) = createRefs()
 
             Text(
-                text = (player.firstName?: "") + (player.lastName ?: ""),
+                text = (player.firstName?: "") + " " + (player.lastName ?: ""),
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier =  Modifier.constrainAs(txtName) {
@@ -71,7 +71,7 @@ fun ScreenPlayerDetail(
                             indication = rememberRipple(color = MaterialTheme.colorScheme.surfaceTint),
                             enabled = true
                         ) {
-                            onTeamClicked.invoke(player.team)
+                            onTeamClicked.invoke(player.team.id)
                         }.constrainAs(team) {
                             end.linkTo(parent.end)
                             top.linkTo(parent.top)
@@ -95,7 +95,7 @@ fun ScreenPlayerDetail(
             if(player.position.isNullOrBlank().not()) {
                 Text(
                     text = stringResource(
-                        R.string.player_position,
+                        com.example.nba.R.string.player_position,
                         player.position.toString()
                     ),
                     fontSize = 16.sp,
@@ -119,7 +119,7 @@ fun ScreenPlayerDetail(
                 )
                 Text(
                     text = stringResource(
-                        R.string.player_weight_feet_inches,
+                        com.example.nba.R.string.player_weight_feet_inches,
                         player.heightFeet,
                         player.heightInches
                     ),
@@ -145,7 +145,7 @@ fun ScreenPlayerDetail(
                 )
                 Text(
                     text = stringResource(
-                        R.string.player_weight_pounds,
+                        com.example.nba.R.string.player_weight_pounds,
                         player.weightPounds
                     ),
                     fontSize = 14.sp,

@@ -12,7 +12,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class PlayersListViewModel @Inject constructor(
-    private val repository: PlayersListRepository
+    private val repository: PlayersListRepository,
+    private val dataManager: PlayerListDataManager
 ): ViewModel() {
 
     companion object {
