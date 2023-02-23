@@ -12,6 +12,10 @@ import java.util.concurrent.TimeUnit
 /**
  * Mediator works in between local Room database and RestApi data requests,
  * in other words it combines the two services
+ * @param roomDatabase access to local Room database
+ * @param initialPage the initial page at which data loading starts
+ * @param perPage how many items should be loaded per page
+ * @param getPlayerListPage acces to RestApi
  */
 @OptIn(ExperimentalPagingApi::class)
 class PlayersRemoteMediator (
@@ -37,16 +41,16 @@ class PlayersRemoteMediator (
     ): MediatorResult {
         val page: Int = when (loadType) {
             LoadType.REFRESH -> {
-                getRemoteKeyClosestToCurrentPosition(state)?.nextPage ?: initialPage
+                getPagingMetaClosestToCurrentPosition(state)?.nextPage ?: initialPage
             }
             LoadType.PREPEND -> {
-                val remoteKeys = getRemoteKeyForFirstItem(state)
-                val prevKey = if((remoteKeys?.currentPage ?: initialPage) > 0) remoteKeys?.currentPage?.minus(1) else null
-                prevKey ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                val pagingMeta = getPagingMetaForFirstItem(state)
+                val prevKey = if((pagingMeta?.currentPage ?: initialPage) > 0) pagingMeta?.currentPage?.minus(1) else null
+                prevKey ?: return MediatorResult.Success(endOfPaginationReached = pagingMeta != null)
             }
             LoadType.APPEND -> {
-                val remoteKeys = getRemoteKeyForLastItem(state)
-                remoteKeys?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                val pagingMeta = getPagingMetaForLastItem(state)
+                pagingMeta?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = pagingMeta != null)
             }
         }
 
@@ -79,7 +83,8 @@ class PlayersRemoteMediator (
         }
     }
 
-    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
+    /** Returns paging meta data from the current position item via last player identification */
+    private suspend fun getPagingMetaClosestToCurrentPosition(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { id ->
                 roomDatabase.pagingMetaDbDao().getPagingMetaByPlayerId(id)
@@ -87,7 +92,8 @@ class PlayersRemoteMediator (
         }
     }
 
-    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
+    /** Returns paging meta data from the first item via last player identification */
+    private suspend fun getPagingMetaForFirstItem(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
         return state.pages.firstOrNull {
             it.data.isNotEmpty()
         }?.data?.firstOrNull()?.id?.let { id ->
@@ -95,7 +101,8 @@ class PlayersRemoteMediator (
         }
     }
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
+    /** Returns paging meta data from the last item via last player identification */
+    private suspend fun getPagingMetaForLastItem(state: PagingState<Int, PlayerIO>): PagingMetaIO? {
         return state.pages.lastOrNull {
             it.data.isNotEmpty()
         }?.data?.lastOrNull()?.id?.let { id ->
