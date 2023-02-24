@@ -1,20 +1,12 @@
 package com.example.nba.ui.player_detail
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +15,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.nba.ui.players_list.TeamColumn
 
 /**
  * Screen of an NBA player detail
@@ -49,7 +42,7 @@ fun ScreenPlayerDetail(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 12.dp)
         ) {
-            val (txtName, txtHeight, txtWeight, txtPosition, team, imgWeight, imgHeight) = createRefs()
+            val (txtName, txtHeight, txtWeight, txtPosition, imgWeight, imgHeight) = createRefs()
 
             Text(
                 text = (player.firstName?: "") + " " + (player.lastName ?: ""),
@@ -61,36 +54,7 @@ fun ScreenPlayerDetail(
                 }
             )
             if(player.team != null) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(0.5.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
-                        .clickable(
-                            remember { MutableInteractionSource() },
-                            indication = rememberRipple(color = MaterialTheme.colorScheme.surfaceTint),
-                            enabled = true
-                        ) {
-                            onTeamClicked.invoke(player.team.id)
-                        }.constrainAs(team) {
-                            end.linkTo(parent.end)
-                            top.linkTo(parent.top)
-                        }.padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = player.team.name.toString(),
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Text(
-                        text = player.team.city.toString(),
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.inversePrimary,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
+                TeamColumn(playerIO = player, onTeamClicked = onTeamClicked)
             }
             if(player.position.isNullOrBlank().not()) {
                 Text(
