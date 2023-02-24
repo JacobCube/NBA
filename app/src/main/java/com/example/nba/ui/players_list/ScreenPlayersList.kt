@@ -18,13 +18,14 @@ import androidx.paging.compose.items
 @Preview(showBackground = true)
 @Composable
 fun ScreenPlayersList(
+    modifier: Modifier = Modifier,
     onItemClicked: (playerId: Long?) -> Unit = {},
     onTeamClicked: (teamId: Long?) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<PlayersListViewModel>()
     val playersList = viewModel.requestPlayersList().collectAsLazyPagingItems()
 
-    LazyColumn {
+    LazyColumn(modifier) {
         items(
             items = playersList
         ) { player ->
